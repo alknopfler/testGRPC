@@ -1,13 +1,13 @@
 package main
 
-
 import (
 "log"
 "net"
 
-pb "github.com/alknopfler/testGRPC/pb"
+pb "github.com/alknopfler/testGRPC/requester"
 "golang.org/x/net/context"
 "google.golang.org/grpc"
+	"errors"
 )
 
 const (
@@ -16,8 +16,16 @@ const (
 
 type server struct{}
 
-func (s *server) Process(ctx context.Context, in *pb.Config) (*pb.Response, error) {
-	return &pb.Response{Message: "Hello " + in.Data}, nil
+func (s *server) Process(ctx context.Context, in *pb.Request) (*pb.Response, error) {
+	m := make(map[string]string)
+	m["key1"]="value1"
+	m["key2"]="value2"
+
+	if (in.KeyId == "key1" || in.KeyId == "key2") {
+		return &pb.Response{Keyvalue: m}, nil
+	}
+	return &pb.Response{Keyvalue: m}, errors.New("not found")
+
 }
 
 func main() {

@@ -2,16 +2,15 @@ package main
 
 import (
 	"log"
-	"os"
 
-	pb "github.com/alknopfler/testGRPC/pb"
+	pb "github.com/alknopfler/testGRPC/requester"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
 const (
 	address     = "localhost:50051"
-	defaultName = "world"
+	defaultName = "key1"
 )
 
 func main() {
@@ -22,13 +21,11 @@ func main() {
 	defer conn.Close()
 	c := pb.NewRequesterClient(conn)
 
-	name := defaultName
-	if len(os.Args) > 1 {
-		name = os.Args[1]
-	}
-	r, err := c.Process(context.Background(), &pb.Config{Data: name})
+
+	key := defaultName
+	r, err := c.Process(context.Background(), &pb.Request{KeyId: key})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Greeting: %s", r.Message)
+	log.Printf("Output from server: %s", r.Keyvalue[key])
 }
